@@ -1,0 +1,92 @@
+{
+  "customer_id": "14726",
+  "shap": [
+    {
+      "feature": "recency",
+      "value": 554.4756944444445,
+      "contribution": 0.08215918983618992
+    },
+    {
+      "feature": "engagement",
+      "value": 4.760131686224747,
+      "contribution": 0.06641301030940899
+    },
+    {
+      "feature": "historical_clv",
+      "value": 116.5,
+      "contribution": 0.03853569995498533
+    },
+    {
+      "feature": "monetary",
+      "value": 116.5,
+      "contribution": 0.03514821082452883
+    },
+    {
+      "feature": "spend_90d",
+      "value": 0.0,
+      "contribution": 0.027918016769301925
+    },
+    {
+      "feature": "seasonal_concentration",
+      "value": 1.0,
+      "contribution": 0.024677306755499475
+    },
+    {
+      "feature": "frequency",
+      "value": 1.0,
+      "contribution": 0.023764246929516605
+    },
+    {
+      "feature": "orders_90d",
+      "value": 0.0,
+      "contribution": 0.022849786734973416
+    },
+    {
+      "feature": "gap_variance",
+      "value": 0.0,
+      "contribution": 0.022654435454305684
+    },
+    {
+      "feature": "tenure",
+      "value": 554.4756944444445,
+      "contribution": 0.02053117453170591
+    }
+  ],
+  "lime": [
+    {
+      "feature": "numeric__recency > 325.70",
+      "contribution": 0.09816734690492121
+    },
+    {
+      "feature": "numeric__engagement <= 11.61",
+      "contribution": 0.06397373564875324
+    },
+    {
+      "feature": "numeric__spend_90d <= 0.00",
+      "contribution": 0.06224531796438033
+    },
+    {
+      "feature": "numeric__orders_90d <= 0.00",
+      "contribution": 0.0411703337397322
+    },
+    {
+      "feature": "0.50 < numeric__seasonal_concentration <= 1.00",
+      "contribution": 0.03464792732999424
+    },
+    {
+      "feature": "numeric__gap_variance <= 0.00",
+      "contribution": 0.02996101045574602
+    },
+    {
+      "feature": "numeric__historical_clv <= 283.04",
+      "contribution": 0.02715088385339859
+    },
+    {
+      "feature": "numeric__monetary <= 321.40",
+      "contribution": 0.026972587432881747
+    }
+  ],
+  "lime_local_fit": 0.5246572764185071,
+  "explanation": "The model associates days since the last purchase, the engagement score, historical net spending with higher churn risk relative to its baseline.",
+  "units": "Signed model-output contribution. Random Forest explains probability; some other models use log-odds. Associations are not causal effects."
+}

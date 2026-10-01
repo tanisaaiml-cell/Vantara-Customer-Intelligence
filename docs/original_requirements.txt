@@ -1,0 +1,460 @@
+VANTARA RETAIL SOLUTIONS
+Data Science & Analytics Division
+PRODUCT REQUIREMENTS DOCUMENT
+Customer Behavior Prediction Platform
+A Machine Learning & Deep Learning System for Churn, Lifetime Value, and Purchase Behavior Prediction
+Field
+Detail
+Document Owner
+Data Science & Analytics Division
+Assigned Engineer
+Single Contributor (Data Scientist / ML Engineer Intern-to-Associate level)
+Project Duration
+4 Weeks (20 Working Days)
+Document Version
+v1.0
+Status
+Approved for Execution
+Classification
+Internal – Training & Onboarding Project
+
+Table of Contents
+1. Executive Summary
+2. Business Problem & Motivation
+3. Goals, Objectives & Success Metrics
+4. Scope of Work
+5. Dataset Specification
+6. Functional Requirements – Data Pipeline
+7. Functional Requirements – Feature Engineering
+8. Functional Requirements – Modeling
+9. Functional Requirements – Customer Segmentation
+10. Functional Requirements – Explainability (XAI)
+11. Functional Requirements – Evaluation
+12. Functional Requirements – Deployment & Dashboard
+13. Non-Functional Requirements
+14. System Architecture
+15. Repository & Folder Structure
+16. Mathematical Foundations Reference
+17. 4-Week Execution Plan
+18. Deliverables Checklist
+19. Risks & Mitigations
+20. Acceptance Criteria
+21. Tools & Technologies Required
+
+1. Executive Summary
+Vantara Retail Solutions operates an omnichannel retail and e-commerce business serving both direct consumers and small business resellers. Over the past three years, the volume of transactional data captured through the order management system, loyalty program, and web analytics stack has grown substantially, but this data is not yet being used to drive proactive, customer-level decisions.
+This document specifies the requirements for a Customer Behavior Prediction Platform — an internal analytics system that ingests historical transaction data and produces churn risk scores, customer lifetime value estimates, next-purchase probability, product recommendations, and customer segments. The platform will be delivered as a working prototype with a REST API, an interactive dashboard, and full documentation, built end-to-end by a single data scientist over a four-week sprint.
+The platform is intended to serve as both a functioning internal analytics tool for the Marketing and Retention teams and a reference implementation demonstrating the organization's applied machine learning capability. It is designed to be handed over to a new team member or a rotational trainee as a self-contained, well-specified assignment.
+2. Business Problem & Motivation
+2.1 Problem Statement
+The Retention and Marketing teams currently rely on manual, rule-based segmentation (for example, “customers who haven’t ordered in 90 days”) to decide who receives discount campaigns, re-engagement emails, or loyalty offers. This approach is reactive, treats all customers within a segment identically, and does not account for the underlying purchase patterns that predict whether a customer is actually at risk of churning or likely to respond to an offer.
+Without a predictive system, the business faces three recurring issues:
+Marketing spend is distributed evenly across at-risk customers instead of being prioritized by predicted value and predicted churn probability, reducing campaign ROI.
+High-value customers who show early warning signs of disengagement are identified too late, typically after they have already stopped purchasing for several months.
+Product recommendations shown on the website and in email campaigns are based on simple “best-seller” logic rather than individual purchase history, resulting in low click-through and conversion rates.
+2.2 Motivation
+Retail and e-commerce margins are increasingly sensitive to customer acquisition cost. Retaining an existing customer is significantly cheaper than acquiring a new one, which makes early, accurate churn prediction and lifetime value estimation directly tied to profitability. A single, well-engineered predictive platform can replace several disconnected manual reports currently produced by the analytics team on an ad-hoc basis.
+2.3 Real-World Applications
+Prioritized retention campaigns targeted at high-value, high-churn-risk customers.
+Dynamic discount allocation based on predicted discount sensitivity rather than blanket promotions.
+Inventory and demand planning informed by predicted purchase timing and category demand.
+Personalized product recommendations embedded in the marketing email pipeline.
+Executive reporting on cohort-level revenue forecasts and customer health.
+3. Goals, Objectives & Success Metrics
+3.1 Objectives
+1.	Build a reproducible data pipeline that transforms raw transaction logs into a clean, feature-rich customer-level dataset.
+2.	Train and compare multiple machine learning models for churn prediction and at least one regression model for customer lifetime value.
+3.	Build a supervised deep learning model for sequential purchase behavior and an unsupervised model for anomaly/fraud-pattern detection.
+4.	Segment the customer base using at least two clustering algorithms and produce actionable segment profiles.
+5.	Make every prediction explainable at both the global and individual customer level.
+6.	Expose the trained models through a REST API and a business-facing dashboard that a non-technical stakeholder can use unassisted.
+3.2 Success Metrics
+Metric
+Target
+Churn model ROC-AUC (held-out test set)
+≥ 0.80
+CLV regression – R² on test set
+≥ 0.60
+Churn model recall on the churned class
+≥ 0.70 (prioritized over raw accuracy)
+API p95 response time for single-customer prediction
+< 400 ms
+Dashboard load time for full segment view
+< 3 seconds
+Documented, reproducible pipeline (single command re-run)
+100% of steps scripted, no manual notebook-only steps in production path
+Note on class imbalance: churn is expected to be a minority class in most retail datasets. Because of this, accuracy is intentionally de-prioritized in favor of recall, precision, F1-score, and ROC-AUC, all of which must be reported together rather than in isolation.
+4. Scope of Work
+4.1 In Scope
+End-to-end pipeline from raw transaction-level CSV data to customer-level feature table.
+Classical machine learning models: Logistic Regression, Decision Tree, Random Forest, XGBoost, LightGBM, and one distance-based model (KNN or SVM) for churn classification.
+One deep learning classifier (feed-forward ANN) trained on the same feature set for comparison against classical models.
+One sequence model (LSTM) trained on time-ordered purchase sequences to model purchase timing/recency behavior.
+One autoencoder for unsupervised anomaly detection on spending patterns.
+Customer segmentation using K-Means and one additional algorithm (DBSCAN or Gaussian Mixture Models).
+SHAP-based explainability for the best-performing churn model, plus at least one LIME example for a single customer.
+A FastAPI service exposing prediction endpoints and a Streamlit dashboard consuming that service.
+Containerization with Docker and a documented local deployment procedure.
+4.2 Out of Scope (Explicitly Deferred)
+Transformer-based sequence models — documented as a future enhancement rather than a Week 1–4 deliverable, given the timeline.
+Real-time streaming ingestion (Kafka/event pipelines) — the platform will operate on scheduled batch scoring for this phase.
+Multi-tenant authentication, role-based access control, and production-grade CI/CD — noted as future hardening work.
+A/B testing framework for measuring the actual business impact of the model's recommendations in live campaigns.
+Scoping these items out is a deliberate decision to keep the project achievable by one engineer in four weeks while still covering the full ML/DL lifecycle at a meaningful depth rather than superficially touching every possible technique.
+5. Dataset Specification
+5.1 Primary Dataset
+The platform will be built on the Online Retail II dataset, published on the UCI Machine Learning Repository and mirrored on Kaggle. This is a real transactional dataset from a UK-based online retailer covering all purchases made between 01 December 2009 and 09 December 2011.
+Attribute
+Detail
+Source
+UCI Machine Learning Repository (“Online Retail II”), also mirrored on Kaggle
+Size
+Approximately 1,067,371 transaction line items across two sheets (2009–2010 and 2010–2011)
+Granularity
+One row per invoice line item (a single product within an order)
+Key Fields
+Invoice, StockCode, Description, Quantity, InvoiceDate, Price, Customer ID, Country
+Unique Customers
+Approximately 5,900 identified customers (rows with a valid Customer ID)
+Target Variables Derived
+Churn label (no purchase in the next 90 days), Customer Lifetime Value, Next Purchase Category
+5.2 Supplementary Dataset (Optional Enrichment)
+For richer demographic and behavioral features, the Customer Personality Analysis dataset (Kaggle) can optionally be used as a secondary, independently-trained module to demonstrate handling of a dataset that already includes engineered demographic fields (income, family composition, campaign response history). This is treated as a stretch goal, not a core dependency, since it does not share customer keys with the transactional dataset and must be modeled separately.
+5.3 Known Data Quality Issues
+A meaningful share of invoice line items have a missing Customer ID and must be excluded from customer-level modeling (they remain usable for product-level analysis only).
+Negative Quantity values represent returns/cancellations and must be handled explicitly rather than dropped, since return behavior is itself a predictive signal.
+A small number of unit prices are zero or negative, corresponding to adjustments and manual corrections, and require a documented cleaning rule.
+StockCode contains some non-product administrative codes (postage, bank charges, manual entries) that must be filtered out of product affinity features.
+InvoiceDate spans a leap year and multiple holiday seasons, which must be accounted for when engineering seasonal features.
+5.4 Why This Dataset Is Appropriate
+The dataset is real, publicly documented, large enough to support customer-level aggregation with a statistically meaningful number of repeat customers, and messy in realistic ways (missing IDs, returns, inconsistent descriptions). This makes it suitable for demonstrating genuine data cleaning and feature engineering skill, rather than working with a dataset that is already analysis-ready.
+5.5 Dataset Access Instructions
+No account, login, or approval is required to obtain this dataset. Use the UCI Machine Learning Repository as the authoritative source of record; do not substitute the separate, older “Online Retail” (single-year) dataset, which is a different dataset with a similar name.
+Option A – Direct download (manual)
+1.	Open the dataset page: https://archive.ics.uci.edu/dataset/502/online+retail+ii
+2.	Locate the “Dataset Files” section and click the Download button. This downloads a .zip file (approximately 43.5 MB) — no sign-up required.
+3.	Unzip the archive. It contains a single file, online_retail_II.xlsx, with two sheets: “Year 2009-2010” and “Year 2010-2011”.
+4.	Place the file in the data/raw/ directory as specified in Section 15, and load both sheets, e.g.:
+import pandas as pd
+df_1 = pd.read_excel("data/raw/online_retail_II.xlsx", sheet_name="Year 2009-2010")
+df_2 = pd.read_excel("data/raw/online_retail_II.xlsx", sheet_name="Year 2010-2011")
+df = pd.concat([df_1, df_2], ignore_index=True)
+Option B – Programmatic access (recommended)
+This method avoids the manual download/unzip step entirely and guarantees every student is working from the identical dataset version, which keeps results comparable across submissions.
+pip install ucimlrepo
+
+from ucimlrepo import fetch_ucirepo
+online_retail_ii = fetch_ucirepo(id=502)
+df = online_retail_ii.data.features
+Option B is the default method students should use. Option A is provided as a fallback for environments where the ucimlrepo package cannot be installed (for example, restricted or offline lab machines).
+Optional Kaggle Mirrors
+If a Kaggle-hosted copy is preferred (for example, to preview the data in a browser before downloading), the following mirrors host the same dataset. A free Kaggle account is required to download from these:
+https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci
+https://www.kaggle.com/datasets/mathchi/online-retail-ii-data-set-from-ml-repository
+Licensing note: the dataset is distributed under a Creative Commons Attribution 4.0 International (CC BY 4.0) license, which permits use and adaptation for this project provided the source is credited as: Chen, D. (2012). Online Retail II [Dataset]. UCI Machine Learning Repository.
+6. Functional Requirements – Data Pipeline
+6.1 Data Collection
+The pipeline must load both sheets of the source workbook, standardize column names and types, and combine them into a single chronologically ordered transaction table before any cleaning logic is applied.
+6.2 Data Cleaning
+Remove or explicitly flag rows with missing Customer ID depending on downstream use (product-level vs customer-level tables).
+Deduplicate exact duplicate invoice lines while preserving legitimate repeated purchases of the same SKU in the same order.
+Detect outliers in Quantity and Price using IQR-based bounds and domain rules (e.g., bulk wholesale orders), and separate true data-entry errors from legitimate bulk purchases.
+Standardize inconsistent product descriptions (case, whitespace, known typos) using a lookup table keyed on StockCode.
+Implement automated data validation checks (schema checks, null-rate thresholds, date-range checks) that run before the feature engineering stage and fail loudly if violated.
+6.3 Data Wrangling
+All wrangling must be implemented in Pandas and NumPy as versioned, unit-testable functions rather than inline notebook cells, so the same logic can run in both the training pipeline and the live scoring API.
+Categorical encoding: one-hot encoding for low-cardinality fields (Country), target/frequency encoding for high-cardinality fields (StockCode-derived features).
+Numerical scaling: StandardScaler for models sensitive to feature scale (Logistic Regression, KNN, SVM, neural networks); tree-based models trained on unscaled features.
+Persist the fitted encoders and scalers as artifacts so the exact same transformation is applied at inference time.
+6.4 Exploratory Data Analysis
+Univariate and bivariate statistical summaries of spend, frequency, and recency distributions.
+Correlation analysis between engineered features and the churn/CLV targets, with multicollinearity checked via VIF before finalizing the feature set.
+Country-level and seasonal purchase distribution analysis.
+A documented EDA notebook that ends with a written list of hypotheses the modeling stage will test.
+7. Functional Requirements – Feature Engineering
+The following customer-level features must be computed and documented with a one-line justification for why each feature contributes predictive signal.
+Feature
+Why It Matters
+Recency (days since last purchase)
+Directly precedes churn; the single strongest univariate churn predictor in retail data.
+Frequency (number of distinct orders)
+Distinguishes habitual buyers from one-time purchasers.
+Monetary value (total and average spend)
+Core input for both churn risk weighting and CLV.
+Customer Lifetime Value (historical + predicted)
+Lets the business prioritize retention spend by expected return, not just churn risk.
+Average basket size
+Signals shopping behavior type (top-up vs. bulk shopper).
+Purchase frequency trend (slope over time)
+Captures acceleration or deceleration in engagement that a static average would hide.
+Time between consecutive purchases (variance)
+High variance indicates irregular, harder-to-predict customers.
+Seasonal purchase concentration
+Distinguishes gift-driven or seasonal shoppers from year-round customers.
+Product category affinity vector
+Feeds the recommendation logic and improves next-category prediction.
+Return rate
+A known leading indicator of dissatisfaction and future churn.
+Discount/markdown sensitivity
+Identifies which customers should receive promotional offers versus full-price marketing.
+Engagement score (composite of recency, frequency, monetary)
+A single interpretable score for dashboard consumption by non-technical stakeholders.
+All engineered features must be computed with a point-in-time cutoff discipline: any feature used to predict an event must only use data available strictly before the prediction date, to avoid target leakage. This is a common and serious error in churn modeling and must be explicitly tested for in the pipeline's unit tests.
+8. Functional Requirements – Modeling
+8.1 Classical Machine Learning Models
+Model
+Primary Use
+Notes
+Logistic Regression
+Interpretable churn baseline
+Coefficients double as a first-pass explainability check.
+Decision Tree
+Baseline non-linear model, human-readable rules
+Prone to overfitting; used mainly as a sanity-check model.
+Random Forest
+Robust churn classifier
+Tune n_estimators, max_depth, min_samples_leaf via cross-validated grid/random search.
+XGBoost
+Primary candidate for production churn model
+Tune learning_rate, max_depth, subsample, colsample_bytree; use early stopping on a validation fold.
+LightGBM
+Comparison against XGBoost on training speed and accuracy
+Preferred if categorical features are numerous, due to native categorical handling.
+KNN or SVM (one required)
+Distance-based comparison baseline
+Requires scaled features; used to validate that tree-based gains are genuine and not an artifact of scaling choices.
+CatBoost is documented as an optional additional comparison if time remains in Week 2, but is not a mandatory deliverable given the four-week constraint.
+8.2 Deep Learning Models
+Artificial Neural Network (ANN): a feed-forward network on the same engineered feature set as the classical models, used as a direct accuracy/AUC comparison point. Must include batch normalization, dropout, and early stopping on validation loss.
+LSTM: trained on time-ordered sequences of each customer's purchase events (amount, gap-in-days, category) to model sequential purchase behavior and improve next-purchase-timing prediction beyond what static features capture.
+Autoencoder: trained on scaled spending-pattern features in an unsupervised manner; reconstruction error above a validated threshold flags anomalous accounts for manual review (potential fraud, data entry errors, or extreme high-value outliers).
+A Transformer-based sequence model is documented in Section 4.2 as an explicit future enhancement rather than a required deliverable, since a well-tuned Transformer typically needs a larger sequence dataset and more tuning time than a four-week solo sprint allows.
+8.3 Model Selection Discipline
+All models must be trained with a fixed random seed and a stratified train/validation/test split (recommended 70/15/15) to keep comparisons fair.
+Hyperparameter search must use cross-validation on the training set only; the test set is touched exactly once, at the end, for final reporting.
+Every model run must be logged (parameters, metrics, training time) so the final comparison table in Section 11 can be regenerated from logs rather than re-typed by hand.
+9. Functional Requirements – Customer Segmentation
+K-Means: primary segmentation method; determine k using the elbow method and silhouette score, not an arbitrary fixed number.
+DBSCAN or Gaussian Mixture Models (one required): used specifically to test whether K-Means' spherical-cluster assumption is hiding irregularly shaped or overlapping segments.
+Hierarchical clustering may be used as an exploratory dendrogram-based sanity check on a sampled subset of customers, given its poor scalability to the full customer base.
+Each resulting segment must be given a business-readable profile (e.g., “high-frequency low-value,” “lapsed high-value,” “seasonal gift shopper”) with summary statistics, not just a cluster number, since the Marketing team is the end consumer of this output.
+10. Functional Requirements – Explainability (XAI)
+SHAP: global feature importance summary plot for the production churn model, plus SHAP force plots for at least three representative individual customers (one low-risk, one high-risk, one borderline).
+LIME: at least one worked example showing a local explanation for a single prediction, compared against the SHAP explanation for the same customer to illustrate agreement or divergence.
+Partial Dependence Plots for the two or three most influential features (typically recency and frequency) to show the direction and shape of their effect on predicted churn probability.
+A plain-language “why this customer is flagged” explanation template that translates SHAP values into a sentence a marketing analyst can read without any ML background.
+11. Functional Requirements – Evaluation
+Task
+Required Metrics
+Churn classification
+Accuracy, Precision, Recall, F1-score, ROC-AUC, Confusion Matrix
+Customer Lifetime Value regression
+MAE, RMSE, R²
+Clustering quality
+Silhouette score, Davies-Bouldin index
+All supervised models
+5-fold stratified cross-validation on the training set before final test-set evaluation
+A single consolidated comparison table across all classical and deep learning churn models, ranked by ROC-AUC and recall, must be produced in the final report, along with a short written justification of which model is recommended for the production API and why (e.g., XGBoost may win on AUC but the ANN may be retained as a secondary check because its errors are uncorrelated with the tree-based models).
+12. Functional Requirements – Deployment & Dashboard
+12.1 API Service
+FastAPI service exposing: a single-customer prediction endpoint, a batch-scoring endpoint (CSV upload), a model-metadata endpoint, and a health-check endpoint.
+PostgreSQL used to persist scored predictions and segment assignments so the dashboard does not need to recompute scores on every page load.
+Input validation via Pydantic models, with clear error messages for malformed customer records.
+12.2 Dashboard
+Customer segmentation view with interactive filters by segment, country, and value tier.
+Churn risk leaderboard highlighting high-value, high-risk customers first.
+Sales and revenue trend charts with a simple forecast overlay.
+Feature importance and SHAP explanation panel for any individual customer, searchable by Customer ID.
+CSV upload for ad-hoc batch scoring and a downloadable PDF/CSV report of results.
+12.3 Containerization
+The API, dashboard, and database must run via a single `docker-compose up` command for local evaluation, with environment variables used for all configuration (database URL, model artifact paths, log level) rather than hard-coded values.
+13. Non-Functional Requirements
+Code quality: type hints on all function signatures, docstrings on all public functions/classes, and a linter (ruff or flake8) passing with zero errors.
+Logging: structured logging (not print statements) at INFO level for pipeline stages and API requests, WARNING/ERROR for validation failures.
+Testing: unit tests for feature engineering functions (with particular attention to the leakage tests noted in Section 7) and API integration tests, targeting at least 70% coverage on the source package.
+Configuration: all paths, hyperparameters, and thresholds stored in YAML config files, not hard-coded in scripts or notebooks.
+Reproducibility: a fixed random seed and a documented environment file (requirements.txt or pyproject.toml) sufficient to recreate results from a clean environment.
+Security: no credentials committed to version control; database and API secrets loaded from environment variables or a local .env file excluded via .gitignore.
+14. System Architecture
+At a high level, the system is organized into four layers: a data layer (raw files and PostgreSQL), a processing layer (the Pandas/NumPy pipeline and feature store), a modeling layer (trained model artifacts for classical ML, deep learning, and clustering), and a serving layer (the FastAPI service and the Streamlit dashboard that consumes it). Batch scoring jobs write predictions back into PostgreSQL, which both the API and dashboard read from, so the dashboard never needs to call the model directly.
+Deliverable: a one-page architecture diagram (data flow from raw CSV to dashboard) and a simple ER diagram for the PostgreSQL schema (customers, transactions, predictions, segments tables) must be produced during Week 4 documentation and included in the final submission as image files in the docs/ directory.
+15. Repository & Folder Structure
+The repository must follow this structure. Deviating from it requires a written note in the README explaining why.
+customer-behavior-prediction/
+├── data/
+│   ├── raw/                  # original, unmodified source files
+│   ├── interim/              # cleaned but not yet feature-engineered
+│   └── processed/            # final customer-level feature tables
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_feature_engineering.ipynb
+│   └── 03_model_experiments.ipynb
+├── src/
+│   ├── data/                 # loading, cleaning, validation scripts
+│   ├── features/             # RFM, CLV, engagement score builders
+│   ├── models/               # training scripts for ML and DL models
+│   ├── segmentation/         # clustering pipeline
+│   ├── explainability/       # SHAP / LIME wrappers
+│   └── utils/                # shared helpers, logging, config loader
+├── api/
+│   ├── main.py               # FastAPI app entrypoint
+│   ├── routers/
+│   └── schemas/              # Pydantic request/response models
+├── frontend/
+│   └── dashboard.py          # Streamlit dashboard
+├── models_artifacts/          # serialized trained models, scalers, encoders
+├── config/
+│   └── config.yaml
+├── tests/
+│   ├── test_features.py
+│   └── test_api.py
+├── docs/
+│   ├── architecture_diagram.png
+│   ├── er_diagram.png
+│   └── final_report.pdf
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
+16. Mathematical Foundations Reference
+The final report must include a short appendix (2–4 pages) grounding the implementation in the underlying mathematics. This is not a separate research task — it should be written as the models are built, referencing the actual equations used in the code.
+16.1 Statistics & Probability
+RFM and engagement scoring rely on descriptive statistics (mean, median, standard deviation, percentile ranks) and on conditional probability when estimating next-purchase probability, P(purchase | recency, frequency, monetary), which the classification models approximate directly through their predicted probability output.
+16.2 Linear Algebra & PCA
+Feature matrices are represented as X ∈ ℝ^(n×d). Principal Component Analysis, used optionally for visualization of customer segments in two dimensions, finds the eigenvectors of the covariance matrix Σ = (1/n) XᵀX that capture the directions of maximum variance.
+16.3 Logistic Regression & Cross-Entropy
+The logistic regression baseline models P(y=1|x) = 1 / (1 + e^−(wᵀx+b)), trained by minimizing the binary cross-entropy loss L = −(1/n) Σ [yᵢ log(ŷᵢ) + (1−yᵢ) log(1−ŷᵢ)].
+16.4 Gradient Descent & Backpropagation
+Neural network weights are updated iteratively as w ← w − η ∇L(w), where η is the learning rate. Backpropagation computes ∇L(w) via the chain rule through each layer of the ANN and LSTM, and the report must show the loss curve (training vs. validation) used to confirm convergence and detect overfitting.
+16.5 Regularization
+L1 (Lasso) and L2 (Ridge) penalty terms are added to the logistic regression and neural network loss functions to discourage overfitting; dropout in the ANN and LSTM serves an analogous regularizing role by randomly deactivating units during training.
+16.6 Evaluation Metric Definitions
+Precision = TP/(TP+FP), Recall = TP/(TP+FN), F1 = 2·(Precision·Recall)/(Precision+Recall), and ROC-AUC summarizes the trade-off between true positive rate and false positive rate across all classification thresholds rather than a single fixed cutoff.
+17. 4-Week Execution Plan
+This plan assumes a single contributor working full-time (approximately 8 hours/day, 5 days/week, 20 working days total). Each week ends with a checkpoint deliverable so progress can be reviewed without waiting until the final handover.
+Week 1 – Data Foundation & Feature Engineering (Days 1–5)
+Day
+Focus
+Day 1
+Environment setup, repository scaffolding, download and inspect raw dataset, write initial data validation checks.
+Day 2
+Data cleaning: missing values, duplicates, outlier handling, returns/cancellations logic.
+Day 3
+Exploratory Data Analysis: statistical summaries, correlation analysis, visualizations, written hypotheses.
+Day 4
+Feature engineering: RFM, CLV (historical), basket size, purchase trend features, leakage unit tests.
+Day 5
+Feature engineering completion: engagement score, discount sensitivity, product affinity; checkpoint review of processed dataset.
+Week 2 – Classical Machine Learning & Segmentation (Days 6–10)
+Day
+Focus
+Day 6
+Train/validation/test split strategy, baseline Logistic Regression and Decision Tree models.
+Day 7
+Random Forest and XGBoost with cross-validated hyperparameter tuning.
+Day 8
+LightGBM and KNN/SVM comparison model; CLV regression model.
+Day 9
+K-Means and DBSCAN/GMM clustering; segment profiling and business-readable labeling.
+Day 10
+Consolidated model comparison table and checkpoint review of Week 2 results.
+Week 3 – Deep Learning & Explainability (Days 11–15)
+Day
+Focus
+Day 11
+ANN architecture design and training with batch normalization, dropout, and early stopping.
+Day 12
+LSTM data preparation (sequence construction) and training for purchase-timing behavior.
+Day 13
+Autoencoder training for anomaly detection and threshold validation.
+Day 14
+SHAP global and individual explanations for the production churn model.
+Day 15
+LIME comparison example, Partial Dependence Plots, plain-language explanation template; checkpoint review.
+Week 4 – Deployment, Dashboard & Documentation (Days 16–20)
+Day
+Focus
+Day 16
+FastAPI service: prediction, batch, metadata, and health-check endpoints; PostgreSQL schema and integration.
+Day 17
+Streamlit dashboard: segmentation view, churn leaderboard, revenue trends.
+Day 18
+Dashboard: individual-customer explanation panel, CSV upload/batch scoring, downloadable reports.
+Day 19
+Dockerization, docker-compose integration, end-to-end test of the full stack from a clean environment.
+Day 20
+Final report, architecture and ER diagrams, README, API documentation, recorded walkthrough, handover.
+18. Deliverables Checklist
+Cleaned, validated, feature-engineered customer-level dataset with documented pipeline scripts.
+Trained and serialized artifacts for all required classical ML, deep learning, and clustering models.
+Model comparison report with metrics tables and a written model-selection justification.
+SHAP and LIME explainability outputs, including the plain-language explanation template.
+Working FastAPI service with documented endpoints (OpenAPI/Swagger auto-docs enabled).
+Working Streamlit dashboard covering all views specified in Section 12.2.
+Dockerized deployment runnable via a single command.
+Architecture diagram, ER diagram, and workflow diagram (image files in docs/).
+Unit and integration test suite with a coverage report.
+Final written report including the mathematical foundations appendix and a future enhancements section.
+README with setup instructions sufficient for a new engineer to run the project from a clean clone.
+19. Risks & Mitigations
+Risk
+Mitigation
+Only ~5,900 unique customers limits deep learning model performance
+Use the ANN and LSTM primarily as comparative/learning exercises; rely on gradient-boosted trees as the production recommendation, and state this trade-off explicitly in the report.
+Class imbalance in churn labels
+Use class-weighting or SMOTE on the training set only (never on validation/test), and report recall/F1/AUC rather than accuracy.
+Target leakage in engineered features
+Enforce point-in-time cutoff discipline (Section 7) and add explicit leakage unit tests before model training begins.
+Four-week timeline pressure on deep learning + deployment in the same phase
+Week 3 and Week 4 scopes are intentionally fixed in Section 17; if behind schedule, drop the Transformer stretch goal and CatBoost comparison first — they are explicitly non-mandatory.
+Single point of failure (one engineer, no code review)
+Daily checkpoint deliverables (Section 17) allow a manager or mentor to review progress incrementally rather than only at final handover.
+20. Acceptance Criteria
+1.	The pipeline runs end-to-end from raw data to processed feature table using a single documented command, with no manual notebook intervention required.
+2.	At least six classical ML models and the three specified deep learning models are trained, logged, and compared using the metrics defined in Section 11.
+3.	Customer segments are produced with business-readable profiles, not just numeric cluster labels.
+4.	SHAP and LIME explanations are available for individual customer predictions through the dashboard, not only in a notebook.
+5.	The FastAPI service and Streamlit dashboard both run successfully via `docker-compose up` on a clean machine.
+6.	Test coverage on the src/ package is at least 70%, and all leakage-prevention tests pass.
+7.	All success metrics defined in Section 3.2 are met or, where not met, explicitly discussed with a documented reason in the final report.
+21. Tools & Technologies Required
+The following tools and libraries are required to complete this project as specified. Version pinning should be recorded in requirements.txt at the time of setup.
+21.1 Core Language & Environment
+Python 3.10 or later
+Virtual environment manager (venv or conda)
+Git and a GitHub (or equivalent) repository for version control
+21.2 Data Handling & Analysis
+Pandas – data wrangling and transformation
+NumPy – numerical computation
+Matplotlib and Seaborn – static visualizations for EDA
+Plotly – interactive charts for the dashboard
+21.3 Machine Learning
+Scikit-learn – Logistic Regression, Decision Tree, Random Forest, KNN, SVM, K-Means, DBSCAN, GMM, preprocessing utilities, and evaluation metrics
+XGBoost
+LightGBM
+CatBoost (optional comparison, Section 8.1)
+imbalanced-learn – SMOTE and class-imbalance handling
+21.4 Deep Learning
+TensorFlow (Keras API) or PyTorch – pick one consistently for ANN, LSTM, and Autoencoder implementations
+21.5 Explainability
+SHAP
+LIME
+21.6 Backend & Deployment
+FastAPI
+Uvicorn – ASGI server for FastAPI
+Pydantic – request/response validation
+PostgreSQL (or MongoDB as an accepted alternative for the predictions store)
+SQLAlchemy – database ORM/connection layer
+Docker and Docker Compose
+21.7 Frontend / Dashboard
+Streamlit (primary recommendation for the four-week timeline) or React with a charting library, if front-end experience is available
+21.8 Testing & Code Quality
+Pytest – unit and integration testing
+Coverage.py – test coverage reporting
+Ruff or Flake8 – linting
+Black – code formatting
+21.9 Experiment Tracking & Documentation
+MLflow or a simple structured logging/CSV-based experiment log – to record model runs referenced in Section 8.3
+Jupyter Notebook or JupyterLab – for the EDA and experimentation notebooks in notebooks/
+Draw.io, Lucidchart, or an equivalent diagramming tool – for the architecture and ER diagrams in Section 14
+— End of Document —

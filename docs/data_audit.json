@@ -1,0 +1,14 @@
+{
+  "raw_rows": 1067371,
+  "missing_customer_rate": 0.22766872999172733,
+  "exact_duplicate_rows": 34335,
+  "quantity_iqr_flagged": 114434,
+  "price_iqr_flagged": 66196,
+  "invalid_price_or_zero_quantity": 6019,
+  "quarantined_extremes": 7,
+  "clean_rows": 1027010,
+  "return_rows": 19100,
+  "identified_customers": 5938,
+  "min_date": "2009-12-01 07:45:00",
+  "max_date": "2011-12-09 12:50:00"
+}

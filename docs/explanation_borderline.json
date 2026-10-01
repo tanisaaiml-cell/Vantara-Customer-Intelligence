@@ -1,0 +1,92 @@
+{
+  "customer_id": "14609",
+  "shap": [
+    {
+      "feature": "recency",
+      "value": 43.28888888888889,
+      "contribution": -0.05526607562132992
+    },
+    {
+      "feature": "engagement",
+      "value": 54.457640690273735,
+      "contribution": -0.04248248727436839
+    },
+    {
+      "feature": "frequency",
+      "value": 9.0,
+      "contribution": -0.03800324834934371
+    },
+    {
+      "feature": "spend_90d",
+      "value": 342.36,
+      "contribution": -0.0346105600657681
+    },
+    {
+      "feature": "orders_90d",
+      "value": 2.0,
+      "contribution": -0.032846224177516294
+    },
+    {
+      "feature": "sku_popularity",
+      "value": 0.00023553138893955554,
+      "contribution": 0.03229067085361182
+    },
+    {
+      "feature": "gap_variance",
+      "value": 1242.057869130291,
+      "contribution": -0.024999152602780073
+    },
+    {
+      "feature": "unique_products",
+      "value": 6.0,
+      "contribution": 0.022154752856727904
+    },
+    {
+      "feature": "seasonal_concentration",
+      "value": 0.2222222222222222,
+      "contribution": -0.02164392635743365
+    },
+    {
+      "feature": "tenure",
+      "value": 568.5916666666667,
+      "contribution": 0.01734455476166256
+    }
+  ],
+  "lime": [
+    {
+      "feature": "numeric__recency <= 58.40",
+      "contribution": -0.07829323455908507
+    },
+    {
+      "feature": "numeric__engagement > 49.15",
+      "contribution": -0.0689841258111277
+    },
+    {
+      "feature": "numeric__spend_90d > 338.82",
+      "contribution": -0.058589047284621575
+    },
+    {
+      "feature": "country__country_Unspecified <= 0.00",
+      "contribution": -0.05254301418940124
+    },
+    {
+      "feature": "numeric__orders_90d > 1.00",
+      "contribution": -0.04716596620420738
+    },
+    {
+      "feature": "country__country_Sweden <= 0.00",
+      "contribution": 0.03965782049886139
+    },
+    {
+      "feature": "numeric__frequency > 5.25",
+      "contribution": -0.03940957583511203
+    },
+    {
+      "feature": "country__country_Netherlands <= 0.00",
+      "contribution": -0.027914144431620186
+    }
+  ],
+  "lime_local_fit": 0.4000623006587356,
+  "explanation": "The model associates sku popularity, unique products, tenure with higher churn risk relative to its baseline.",
+  "units": "Signed model-output contribution. Random Forest explains probability; some other models use log-odds. Associations are not causal effects."
+}

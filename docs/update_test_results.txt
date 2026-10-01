@@ -1,0 +1,76 @@
+...........sssssss....................................                   [100%]
+=============================== warnings summary ===============================
+../../.venv311/lib/python3.11/site-packages/starlette/testclient.py:37
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../.venv311/lib/python3.11/site-packages/matplotlib/_mathtext.py:45
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/test_features.py::test_validation_errors[invoice_date-invalid]
+  /workspace/scratch/2067403f933f/project_update/customer-behavior-prediction/src/data/pipeline.py:40: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+    frame["invoice_date"] = pd.to_datetime(frame.invoice_date, errors="coerce")
+
+tests/test_training_integration.py::test_full_training_reproducibility
+tests/test_training_integration.py::test_full_training_reproducibility
+tests/test_training_integration.py::test_full_training_reproducibility
+tests/test_training_integration.py::test_full_training_reproducibility
+tests/test_training_integration.py::test_full_training_reproducibility
+tests/test_training_integration.py::test_full_training_reproducibility
+  /workspace/scratch/2067403f933f/.venv311/lib/python3.11/site-packages/sklearn/linear_model/_logistic.py:451: DeprecationWarning: scipy.optimize: The `disp` and `iprint` options of the L-BFGS-B solver are deprecated and will be removed in SciPy 1.18.0.
+    opt_res = optimize.minimize(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.11.13-final-0 _______________
+
+Name                             Stmts   Miss  Cover   Missing
+--------------------------------------------------------------
+src/__init__.py                      0      0   100%
+src/data/__init__.py                 0      0   100%
+src/data/database.py                35      0   100%
+src/data/exports.py                 20      4    80%   22-25
+src/data/pipeline.py                51     10    80%   14-32
+src/data/prepare.py                 26     26     0%   3-35
+src/explainability/__init__.py       0      0   100%
+src/explainability/explain.py       33      3    91%   22-25
+src/features/__init__.py             0      0   100%
+src/features/build.py               87      0   100%
+src/models/__init__.py               0      0   100%
+src/models/deep.py                  75      0   100%
+src/models/diagnostics.py           56      5    91%   52, 57, 65, 78, 84
+src/models/evaluate.py              14      0   100%
+src/models/service.py               48      0   100%
+src/models/train.py                177      1    99%   336
+src/segmentation/__init__.py         0      0   100%
+src/segmentation/cluster.py         34      0   100%
+src/utils/__init__.py                0      0   100%
+src/utils/config.py                 14      0   100%
+src/utils/pdf_fonts.py               9      0   100%
+--------------------------------------------------------------
+TOTAL                              679     49    93%
+Coverage JSON written to file docs/update_coverage.json
+47 passed, 7 skipped, 22 warnings in 116.66s (0:01:56)

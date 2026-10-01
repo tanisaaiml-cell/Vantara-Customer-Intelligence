@@ -1,0 +1,92 @@
+{
+  "customer_id": "14849",
+  "shap": [
+    {
+      "feature": "engagement",
+      "value": 92.04222204725401,
+      "contribution": -0.07109010001440076
+    },
+    {
+      "feature": "recency",
+      "value": 19.535416666666666,
+      "contribution": -0.0628076248034413
+    },
+    {
+      "feature": "spend_90d",
+      "value": 2612.34,
+      "contribution": -0.05877006129089699
+    },
+    {
+      "feature": "orders_90d",
+      "value": 5.0,
+      "contribution": -0.05537229394564057
+    },
+    {
+      "feature": "frequency",
+      "value": 33.0,
+      "contribution": -0.04851424218626364
+    },
+    {
+      "feature": "historical_clv",
+      "value": 12300.87,
+      "contribution": -0.04102571951799095
+    },
+    {
+      "feature": "monetary",
+      "value": 12502.32,
+      "contribution": -0.0334472492884264
+    },
+    {
+      "feature": "gap_variance",
+      "value": 379.14792032197,
+      "contribution": -0.027462570800845312
+    },
+    {
+      "feature": "unique_products",
+      "value": 242.0,
+      "contribution": -0.023852893578177527
+    },
+    {
+      "feature": "seasonal_concentration",
+      "value": 0.15151515151515152,
+      "contribution": -0.02304733554460746
+    }
+  ],
+  "lime": [
+    {
+      "feature": "numeric__recency <= 58.40",
+      "contribution": -0.07790236698202177
+    },
+    {
+      "feature": "numeric__engagement > 49.15",
+      "contribution": -0.07193869286156146
+    },
+    {
+      "feature": "numeric__spend_90d > 338.82",
+      "contribution": -0.05729137755112699
+    },
+    {
+      "feature": "numeric__historical_clv > 2317.40",
+      "contribution": -0.04278603764651386
+    },
+    {
+      "feature": "numeric__frequency > 5.25",
+      "contribution": -0.04048988303606624
+    },
+    {
+      "feature": "numeric__orders_90d > 1.00",
+      "contribution": -0.0393403156642628
+    },
+    {
+      "feature": "country__country_Unspecified <= 0.00",
+      "contribution": 0.038294520843650336
+    },
+    {
+      "feature": "233.27 < numeric__gap_variance <= 1946.38",
+      "contribution": -0.030845106585797616
+    }
+  ],
+  "lime_local_fit": 0.46699183033784486,
+  "explanation": "The strongest signals reduce churn risk relative to the model baseline.",
+  "units": "Signed model-output contribution. Random Forest explains probability; some other models use log-odds. Associations are not causal effects."
+}
